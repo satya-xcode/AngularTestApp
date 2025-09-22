@@ -1,0 +1,59 @@
+.parent {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.8s ease;
+}
+
+.login-card .form-control {
+    padding-left: 2.5rem;
+}
+
+.login-card .form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.login-card .form-group .fa {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.btn-custom {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
