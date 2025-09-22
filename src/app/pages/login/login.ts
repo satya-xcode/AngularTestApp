@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -8,11 +9,19 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.css'
 })
 export class Login {
+  private router = inject(Router);
   protected username: string = '';
   protected password: string = '';
 
   protected onSubmit(): void {
-    console.log('Login submitted:', this.username, this.password);
+    if (this.username === 'admin' && this.password === 'password') {
+      this.router.navigate(['/dashboard']);
+      alert('Login successful!');
+    } else {
+      alert('Please enter botsh username and password.');
+      return;
+    }
+
     // Here you would typically handle authentication logic
   }
 }
