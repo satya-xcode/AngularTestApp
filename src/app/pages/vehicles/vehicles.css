@@ -1,0 +1,24 @@
+  /* body {
+      background: #f8f9fa;
+      padding: 2rem;
+  } */
+
+  .card {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 1rem;
+  }
+
+  .table thead {
+      background: #343a40;
+      color: #fff;
+  }
+
+  .btn-custom {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+  }
+
+  .btn-custom:hover {
+      opacity: 0.9;
+  }
