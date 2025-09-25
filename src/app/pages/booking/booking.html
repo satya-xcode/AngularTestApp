@@ -1,6 +1,29 @@
 <div class="container mt-4">
     <div class="col-12">
         <h3 class="mb-3">Vehicle Bookings</h3>
+
+        <!-- Loading -->
+        @if (loading()) {
+        <div class="text-center p-3">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Loading vehicles...</p>
+        </div>
+        }
+
+        <!-- Error -->
+        @if (error()) {
+        <div class="alert alert-danger">
+            {{ error() }}
+        </div>
+        }
+
+        <!-- Error -->
+        @if (message()) {
+        <div class="alert alert-success">
+            {{ message() }}
+        </div>
+        }
+
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
@@ -18,11 +41,11 @@
             </thead>
             <tbody>
                 <!-- Table rows using @for -->
-                @for (booking of bookingList; track $index) {
+                @for (booking of bookings(); track $index) {
                 <tr>
                     <td>{{ booking.BookingId }}</td>
-                    <td>{{ booking.BookingDate }}</td>
                     <td>{{ booking.CustomerName }}</td>
+                    <td>{{ booking.BookingDate }}</td>
                     <td>{{ booking.MobileNo }}</td>
                     <td>{{ booking.Brand }}</td>
                     <td>{{ booking.Model }}</td>
@@ -39,12 +62,7 @@
                     </td>
                 </tr>
                 }
-                <!-- Show message if no bookings -->
-                @if (bookings.length === 0) {
-                <tr>
-                    <td colspan="10" class="text-center">No bookings found</td>
-                </tr>
-                }
+
             </tbody>
         </table>
     </div>
@@ -54,6 +72,14 @@
         <h5 class="card-title">Add / Edit Booking</h5>
         <form [formGroup]="bookingForm">
             <div class="row g-2 mb-2">
+                <div class="col-md-3">
+                    <input name="BookingId" formControlName="BookingId" placeholder="BookingId" class="form-control"
+                        required />
+                </div>
+                <div class="col-md-3">
+                    <input name="BookingUid" formControlName="BookingUid" placeholder="BookingUid" class="form-control"
+                        required />
+                </div>
                 <div class="col-md-3">
                     <input name="CustomerName" formControlName="CustomerName" placeholder="Customer Name"
                         class="form-control" required />
@@ -89,7 +115,15 @@
                         class="form-control" />
                 </div>
                 <div class="col-md-6 d-flex align-items-end">
+                    @if (saveloading()) {
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p>Saving...</p>
+                    </div>
+                    }@else {
                     <button type="submit" (click)="saveNewBooking()" class="btn btn-success me-2">Save</button>
+                    }
+
                     <button type="button" class="btn btn-secondary">Cancel</button>
                 </div>
             </div>

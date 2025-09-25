@@ -7,47 +7,58 @@
                     <h5 class="mb-0"><i class="fa fa-car"></i> Vehicle List</h5>
                     <button class="btn btn-sm btn-light"><i class="fa fa-refresh"></i> Refresh</button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>CarId</th>
-                                    <th>Brand</th>
-                                    <th>Model</th>
-                                    <th>Year</th>
-                                    <th>Color</th>
-                                    <th>Daily Rate</th>
-                                    <th>Reg No</th>
-                                    <th>Image</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Sample Row -->
-                                @for (item of vehicles; track $index) {
-                                <tr>
-                                    <td>{{item.CarId}}</td>
-                                    <td>{{item.Brand}}</td>
-                                    <td>{{item.Model}}</td>
-                                    <td>{{item.Year}}</td>
-                                    <td>{{item.Color}}</td>
-                                    <td>{{item.DailyRate}}</td>
-                                    <td>{{item.RegNo}}</td>
-                                    <td><img [src]="item.CarImage" class="rounded" alt="Car"></td>
-                                    <td>
-                                        <button (click)="editVehicle(item)" class="btn btn-sm btn-warning"><i
-                                                class="fa fa-pencil"></i></button>
-                                        <button (click)="deleteVehicle(item.CarId)" class="btn btn-sm btn-danger"><i
-                                                class="fa fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                }
 
-                            </tbody>
-                        </table>
+                <div class="card-body p-0">
+
+                    <!-- Loading -->
+                    @if (loading()) {
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p>Loading vehicles...</p>
                     </div>
+                    }
+
+                    <!-- Error -->
+                    @if (error()) {
+                    <div class="alert alert-danger">
+                        {{ error() }}
+                    </div>
+                    }
+
+                    <!-- Data Table -->
+                    @if (!loading() && !error()) {
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>CarId</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Year</th>
+                                <th>Color</th>
+                                <th>DailyRate</th>
+                                <th>RegNo</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (v of vehicles(); track v.CarId) {
+                            <tr>
+                                <td>{{ v.CarId }}</td>
+                                <td>{{ v.Brand }}</td>
+                                <td>{{ v.Model }}</td>
+                                <td>{{ v.Year }}</td>
+                                <td>{{ v.Color }}</td>
+                                <td>{{ v.DailyRate }}</td>
+                                <td>{{ v.RegNo }}</td>
+                                <td><img [src]="v.CarImage" width="60" class="rounded shadow-sm" alt="Car"></td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                    }
                 </div>
+
+
             </div>
         </div>
 

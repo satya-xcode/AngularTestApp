@@ -1,0 +1,26 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Vehicles]
+(
+    [CarId] [int] IDENTITY(1,1) NOT NULL,
+    [Brand] [nvarchar](100) NOT NULL,
+    [Model] [nvarchar](100) NOT NULL,
+    [Year] [int] NOT NULL,
+    [Color] [nvarchar](50) NULL,
+    [DailyRate] [decimal](10, 2) NOT NULL,
+    [CarImage] [nvarchar](max) NULL,
+    [RegNo] [nvarchar](50) NOT NULL,
+    PRIMARY KEY CLUSTERED 
+(
+	[CarId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+    UNIQUE NONCLUSTERED 
+(
+	[RegNo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Vehicles]  WITH CHECK ADD CHECK  (([Year]>=(1886)))
+GO

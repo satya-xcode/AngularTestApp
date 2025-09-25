@@ -22,15 +22,24 @@ export interface VehicleBooking {
 })
 export class Booking implements OnInit {
 
+  // signals for state
+  bookings = signal<VehicleBooking[]>([]);
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
+
+  saveloading = signal<boolean>(false);
+  saveError = signal<string | null>(null);
+  message = signal<string | null>(null);
+
   ngOnInit() {
     this.getCarList()
     this.getAllBookings()
   }
 
-  bookings: VehicleBooking[] = []
+
   bookingService = inject(BookingService)
   carList: any[] = []
-  bookingList: any[] = []
+  // bookingList: any[] = []
   bookingForm = new FormGroup({
     CarId: new FormControl(''),
     BookingDate: new FormControl(new Date().toISOString()),
@@ -40,8 +49,8 @@ export class Booking implements OnInit {
     MobileNo: new FormControl(''),
     Brand: new FormControl(''),
     Model: new FormControl(''),
-    BookingUid: new FormControl('1244'),
-    BookingId: new FormControl(123),
+    BookingUid: new FormControl(''),
+    BookingId: new FormControl(''),
   })
 
   getCarList() {
@@ -51,17 +60,40 @@ export class Booking implements OnInit {
   }
 
   getAllBookings() {
-    this.bookingService.getAllBookings().subscribe((response: any) => {
-      this.bookingList = response?.data
-    })
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.bookingService.getAllBookings().subscribe({
+      next: (data: any) => {
+        if (data?.data && Array.isArray(data?.data)) {
+          this.bookings.set(data.data);
+        } else {
+          this.error.set('Invalid data received');
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set('Failed to fetch vehicles: ' + err.message);
+        this.loading.set(false);
+      }
+    });
   }
 
-
   saveNewBooking() {
+    this.saveloading.set(true)
+    this.error.set(null)
+    this.message.set(null)
     const formValues = this.bookingForm.value
-    console.log('values', formValues)
-    this.bookingService.saveBooking(formValues).subscribe((response: any) => {
-      console.log('saving response', response)
+
+    this.bookingService.saveBooking(formValues).subscribe({
+      next: (value: any) => {
+        this.saveloading.set(false)
+        this.message.set(value.message)
+      },
+      error: (error) => {
+        this.error.set(error.error.message)
+        this.saveloading.set(false)
+      }
     })
   }
 
@@ -69,7 +101,16 @@ export class Booking implements OnInit {
 
   }
   deleteBooking(bookingId: Number) {
-
+    this.message.set(null)
+    this.error.set(null)
+    this.bookingService.deleteBooking(bookingId).subscribe({
+      next: (res: any) => {
+        this.message.set(res.message)
+      },
+      error: (er) => {
+        this.error.set(er.error.message)
+      }
+    })
   }
 
 }

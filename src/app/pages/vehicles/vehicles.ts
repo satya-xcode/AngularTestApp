@@ -1,9 +1,9 @@
 import { inject, OnInit } from '@angular/core';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../models/car';
-
+import { BookingService } from '../../services/booking-service';
 
 export interface VehiclesData {
   CarId: number
@@ -24,32 +24,36 @@ export interface VehiclesData {
 })
 export class Vehicles implements OnInit {
   http = inject(HttpClient);
-  vehicles: VehiclesData[] = []
+  bookServices = inject(BookingService)
+  // signals for state
+  vehicles = signal<VehiclesData[]>([]);
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
 
   ngOnInit() {
-    this.getAllVehicles();
+    this.getAllVehicles()
   }
 
   getAllVehicles() {
-    this.http.get<APIResponse>('http://localhost:3000/api/testing/vehicles').subscribe((data: APIResponse) => {
-
-      if (data?.data && Array.isArray(data?.data))
-        console.log('Data fetched successfully:', data.data);
-      this.vehicles = data?.data;
-    })
-
-  }
-  addVehicle(newVehicle: VehiclesData) {
-
-  }
-
-  editVehicle(updatedVehicle: VehiclesData) {
-
-  }
-
-  deleteVehicle(carId: number) {
-
-
+    this.loading.set(true);
+    this.error.set(null);
+    this.bookServices.getAllCars().subscribe({
+      next: (data: any) => {
+        if (data?.data && Array.isArray(data?.data)) {
+          this.vehicles.set(data.data);
+        } else {
+          this.error.set('Invalid data received');
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set('Failed to fetch vehicles: ' + err.message);
+        this.loading.set(false);
+      }
+    });
   }
 
+  addVehicle(newVehicle: VehiclesData) { }
+  editVehicle(updatedVehicle: VehiclesData) { }
+  deleteVehicle(carId: number) { }
 }

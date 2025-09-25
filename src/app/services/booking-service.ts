@@ -14,9 +14,10 @@ export class BookingService {
   saveBooking(bookingData: any) {
     return this.http.post('http://localhost:3000/api/testing/bookings', bookingData)
   }
+  deleteBooking(BookingId: Number) {
+    return this.http.delete('http://localhost:3000/api/testing/bookings', { body: { BookingId } })
+  }
   getAllCars() {
     return this.http.get('http://localhost:3000/api/testing/vehicles');
   }
-
-
 }
