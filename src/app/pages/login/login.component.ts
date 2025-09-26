@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class LoginComponent {
   private router = inject(Router);
   protected username: string = '';
   protected password: string = '';

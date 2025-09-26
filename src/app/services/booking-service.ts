@@ -1,23 +1,29 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { VehicleBooking } from '../pages/booking/booking';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ApiResponse, Vehicle } from '../models/car';
+import { VehicleBooking } from '../models/booking';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:3000/api/testing';
 
-  getAllBookings() {
-    return this.http.get('http://localhost:3000/api/testing/bookings');
+  getAllBookings(): Observable<ApiResponse<VehicleBooking[]>> {
+    return this.http.get<ApiResponse<VehicleBooking[]>>(`${this.apiUrl}/bookings`);
   }
-  saveBooking(bookingData: any) {
-    return this.http.post('http://localhost:3000/api/testing/bookings', bookingData)
+
+  saveBooking(bookingData: Omit<VehicleBooking, 'bookingId'>): Observable<ApiResponse<VehicleBooking>> {
+    return this.http.post<ApiResponse<VehicleBooking>>(`${this.apiUrl}/bookings`, bookingData);
   }
-  deleteBooking(BookingId: Number) {
-    return this.http.delete('http://localhost:3000/api/testing/bookings', { body: { BookingId } })
+
+  updateBooking(bookingId: number, bookingData: Partial<VehicleBooking>): Observable<ApiResponse<VehicleBooking>> {
+    return this.http.put<ApiResponse<VehicleBooking>>(`${this.apiUrl}/bookings/${bookingId}`, bookingData);
   }
-  getAllCars() {
-    return this.http.get('http://localhost:3000/api/testing/vehicles');
+
+  deleteBooking(bookingId: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/bookings`, { body: { BookingId: bookingId } });
   }
 }

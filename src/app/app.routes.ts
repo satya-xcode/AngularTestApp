@@ -1,7 +1,5 @@
-import { Booking, VehicleBooking } from './pages/booking/booking';
 import { Routes } from '@angular/router';
-import { Layout } from './pages/layout/layout';
-import { Vehicles } from './pages/vehicles/vehicles';
+import { LayoutComponent } from './pages/layout/layout.component';
 
 export const routes: Routes = [
     {
@@ -11,24 +9,23 @@ export const routes: Routes = [
     },
     {
         path: 'login',
-        loadComponent: () => import('./pages/login/login').then(m => m.Login),
-        // component: null  Or you can use component: Login if you have imported it
+        loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
     },
     {
         path: '',
-        loadComponent: () => import('./pages/layout/layout').then(m => m.Layout),
+        component: LayoutComponent,
         children: [
             {
                 path: 'dashboard',
-                loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard)
+                loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
             },
             {
                 path: 'vehicles',
-                component: Vehicles
+                loadComponent: () => import('./pages/vehicles/vehicles.component').then(m => m.VehiclesComponent)
             },
             {
                 path: 'bookings',
-                component: Booking
+                loadComponent: () => import('./pages/booking/booking.component').then(m => m.BookingComponent)
             }
         ]
     },

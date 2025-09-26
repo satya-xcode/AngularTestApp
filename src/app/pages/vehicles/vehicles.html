@@ -1,105 +1,138 @@
-<div class="container-fluid">
+<div class="container-fluid mt-4">
     <div class="row g-4">
-        <!-- Vehicle List (col-8) -->
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fa fa-car"></i> Vehicle List</h5>
-                    <button class="btn btn-sm btn-light"><i class="fa fa-refresh"></i> Refresh</button>
+                    <button class="btn btn-sm btn-light" (click)="loadVehicles()" [disabled]="loading()">
+                        <i class="fa fa-refresh"></i> Refresh
+                    </button>
                 </div>
 
                 <div class="card-body p-0">
-
-                    <!-- Loading -->
-                    @if (loading()) {
-                    <div class="text-center p-3">
+                    @if (loading() && vehicles().length === 0) {
+                    <div class="text-center p-5">
                         <div class="spinner-border text-primary" role="status"></div>
-                        <p>Loading vehicles...</p>
+                        <p class="mt-2">Loading vehicles...</p>
                     </div>
                     }
 
-                    <!-- Error -->
                     @if (error()) {
-                    <div class="alert alert-danger">
-                        {{ error() }}
+                    <div class="alert alert-danger m-3">{{ error() }}</div>
+                    }
+
+                    @if (message()) {
+                    <div class="alert alert-success m-3">{{ message() }}</div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Reg. No</th>
+                                    <th>Brand & Model</th>
+                                    <th>Year</th>
+                                    <th>Color</th>
+                                    <th>Daily Rate</th>
+                                    <th>Image</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (vehicle of vehicles(); track vehicle.CarId) {
+                                <tr>
+                                    <td>{{ vehicle.RegNo }}</td>
+                                    <td>{{ vehicle.Brand }} {{ vehicle.Model }}</td>
+                                    <td>{{ vehicle.Year }}</td>
+                                    <td>{{ vehicle.Color }}</td>
+                                    <td>{{ vehicle.DailyRate }}</td>
+                                    <td><img [src]="vehicle.CarImage" width="60" class="rounded shadow-sm"
+                                            alt="Vehicle Image"></td>
+                                    <td>
+                                        <button (click)="editVehicle(vehicle)" class="btn btn-sm btn-warning me-1"
+                                            title="Edit">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button (click)="deleteVehicle(vehicle.CarId)" class="btn btn-sm btn-danger"
+                                            [disabled]="loading()" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                } @empty {
+                                @if (!loading()) {
+                                <tr>
+                                    <td colspan="8" class="text-center p-4">No vehicles found.</td>
+                                </tr>
+                                }
+                                }
+                            </tbody>
+                        </table>
                     </div>
-                    }
-
-                    <!-- Data Table -->
-                    @if (!loading() && !error()) {
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>CarId</th>
-                                <th>Brand</th>
-                                <th>Model</th>
-                                <th>Year</th>
-                                <th>Color</th>
-                                <th>DailyRate</th>
-                                <th>RegNo</th>
-                                <th>Image</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (v of vehicles(); track v.CarId) {
-                            <tr>
-                                <td>{{ v.CarId }}</td>
-                                <td>{{ v.Brand }}</td>
-                                <td>{{ v.Model }}</td>
-                                <td>{{ v.Year }}</td>
-                                <td>{{ v.Color }}</td>
-                                <td>{{ v.DailyRate }}</td>
-                                <td>{{ v.RegNo }}</td>
-                                <td><img [src]="v.CarImage" width="60" class="rounded shadow-sm" alt="Car"></td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                    }
                 </div>
-
-
             </div>
         </div>
 
-        <!-- Vehicle Form (col-4) -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="fa fa-plus"></i> Add / Edit Vehicle</h5>
+                    <h5 class="mb-0">
+                        <i class="fa {{ vehicleForm.get('carId')?.value ? 'fa-pencil' : 'fa-plus' }}"></i>
+                        {{ vehicleForm.get('carId')?.value ? 'Edit' : 'Add' }} Vehicle
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Brand</label>
-                            <input type="text" name="" class="form-control" placeholder="Enter brand">
+                    <form [formGroup]="vehicleForm" (ngSubmit)="saveVehicle()">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="brand" class="form-label">Brand</label>
+                                <input id="brand" formControlName="brand" class="form-control"
+                                    placeholder="e.g., Toyota">
+                            </div>
+                            <div class="col-12">
+                                <label for="model" class="form-label">Model</label>
+                                <input id="model" formControlName="model" class="form-control"
+                                    placeholder="e.g., Camry">
+                            </div>
+                            <div class="col-12">
+                                <label for="regNo" class="form-label">Registration No</label>
+                                <input id="regNo" formControlName="regNo" class="form-control"
+                                    placeholder="e.g., ABC-123">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="year" class="form-label">Year</label>
+                                <input id="year" type="number" formControlName="year" class="form-control"
+                                    placeholder="e.g., 2023">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="color" class="form-label">Color</label>
+                                <input id="color" formControlName="color" class="form-control" placeholder="e.g., Blue">
+                            </div>
+                            <div class="col-12">
+                                <label for="dailyRate" class="form-label">Daily Rate ($)</label>
+                                <input id="dailyRate" type="number" formControlName="dailyRate" class="form-control"
+                                    placeholder="e.g., 50">
+                            </div>
+                            <div class="col-12">
+                                <label for="carImage" class="form-label">Image URL</label>
+                                <input id="carImage" formControlName="carImage" class="form-control"
+                                    placeholder="e.g., https://example.com/image.png">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Model</label>
-                            <input type="text" class="form-control" placeholder="Enter model">
+
+                        <div class="mt-4 d-flex">
+                            <button type="submit" class="btn btn-primary w-100 me-2"
+                                [disabled]="vehicleForm.invalid || loading()">
+                                @if (loading()) {
+                                <span class="spinner-border spinner-border-sm"></span>
+                                } @else {
+                                <span><i class="fa fa-save"></i> {{ vehicleForm.get('carId')?.value ? 'Update' : 'Save'
+                                    }}</span>
+                                }
+                            </button>
+                            <button type="button" class="btn btn-secondary" (click)="initializeForm()"
+                                [disabled]="loading()">Cancel</button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Year</label>
-                            <input type="number" class="form-control" placeholder="Enter year">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Color</label>
-                            <input type="text" class="form-control" placeholder="Enter color">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Daily Rate ($)</label>
-                            <input type="number" class="form-control" placeholder="Enter daily rate">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Registration No</label>
-                            <input type="text" class="form-control" placeholder="Enter registration number">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Car Image</label>
-                            <input type="file" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-custom w-100"><i class="fa fa-save"></i> Save
-                            Vehicle</button>
                     </form>
                 </div>
             </div>
