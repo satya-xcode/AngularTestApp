@@ -1,1 +1,33 @@
-<p>dashboard works!</p>
+<div class="container mt-4" style="gap: 10; display: flex; flex-direction: column;">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <custom-card style="margin-bottom: 30px;">
+        <p>This is the projected content</p>
+    </custom-card>
+
+
+
+    <custom-card-panel>
+        <div>
+            <card-title>Hello</card-title>
+            <div class="card-divider"></div>
+            <card-body>Welcome to the example</card-body>
+        </div>
+    </custom-card-panel>
+
+
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <app-summary-card [title]="customerData.bgColor" [value]="customerData.value"
+                [bgColor]="customerData.bgColor" />
+        </div>
+        <div class="col-md-4">
+            <app-summary-card [title]="bookingData.title" [value]="bookingData.value" [bgColor]="bookingData.bgColor" />
+        </div>
+        <div class="col-md-4">
+            <app-summary-card [title]="vehicleData.title" [value]="vehicleData.title" [bgColor]="vehicleData.bgColor" />
+        </div>
+    </div>
+</div>

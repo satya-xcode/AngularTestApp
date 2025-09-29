@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { VehicleService } from '../../services/vehicle.service';
+import { VehicleService } from '../../services/vehicle-service';
 import { Vehicle } from '../../models/car';
 
 @Component({

@@ -2,7 +2,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BookingService } from './../../services/booking-service';
-import { VehicleService } from '../../services/vehicle.service';
+import { VehicleService } from '../../services/vehicle-service';
 import { VehicleBooking } from '../../models/booking';
 import { Vehicle } from '../../models/car';
 import { CurrencyPipe, DatePipe } from '@angular/common';
