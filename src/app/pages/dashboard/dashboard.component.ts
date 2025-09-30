@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 import { SummaryCard } from "../../components/summary-card/summary-card";
-import { CustomCard } from '../../components/cards/CustomCard';
-import { CardBody, CardTitle, CustomCardPanel } from '../../components/cards/CardTwo';
-
+import { SimpleCustomCard } from '../../components/cardpage/SimpleCustomCard';
 @Component({
   selector: 'app-dashboard',
-  imports: [SummaryCard, CustomCard, CustomCardPanel, CardTitle, CardBody],
+  imports: [SummaryCard, SimpleCustomCard],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
