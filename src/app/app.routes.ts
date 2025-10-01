@@ -19,6 +19,10 @@ export const routes: Routes = [
                 path: 'dashboard',
                 loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
             },
+            {
+                path:'signal',
+                loadComponent:()=> import('./pages/signal/SignalPage').then(s=>s.SignalPage)
+            },
              {
                 path: 'input-properties',
                 loadComponent: () => import('./pages/inputs/InputPropertiesPage').then(m => m.InputPropertiesPage)
