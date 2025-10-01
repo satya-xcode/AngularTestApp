@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect, WritableSignal } from "@angular/core";
+import { Component, signal, computed, effect } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
 interface NetworkConfig {
@@ -113,9 +113,11 @@ interface NetworkConfig {
                 min="1"
                 max="65535"
               />
-              <div class="invalid-feedback" *ngIf="!portValid()">
-                Port must be between 1 and 65535
-              </div>
+              @if (!portValid()) {
+                <div class="invalid-feedback">
+                  Port must be between 1 and 65535
+                </div>
+              }
             </div>
           </div>
           <div class="mt-2">
@@ -124,7 +126,12 @@ interface NetworkConfig {
               [class.bg-success]="portValid()" 
               [class.bg-danger]="!portValid()"
             >
-              Port: {{ port() }} {{ portValid() ? '(Valid)' : '(Invalid)' }}
+              Port: {{ port() }} 
+              @if (portValid()) {
+                (Valid)
+              } @else {
+                (Invalid)
+              }
             </span>
           </div>
         </div>
@@ -148,7 +155,7 @@ interface NetworkConfig {
               Enable Network Features
             </label>
           </div>
-          <div class="mt-2">
+         <div class="mt-2">
             <span class="badge" [class.bg-success]="isEnabled()" [class.bg-secondary]="!isEnabled()">
               Status: {{ isEnabled() ? 'Enabled' : 'Disabled' }}
             </span>
@@ -173,14 +180,21 @@ interface NetworkConfig {
                 (change)="onProtocolChange($event)"
               >
                 <option value="">Select a protocol</option>
-                <option *ngFor="let protocol of protocols()" [value]="protocol">
-                  {{ protocol }}
-                </option>
+                @for (protocol of protocols(); track protocol) {
+                  <option [value]="protocol">{{ protocol }}</option>
+                }
               </select>
             </div>
           </div>
           <div class="mt-2">
-            <span class="badge bg-dark">Selected: {{ selectedProtocol() || 'None' }}</span>
+            <span class="badge bg-dark">
+              Selected: 
+              @if (selectedProtocol()) {
+                {{ selectedProtocol() }}
+              } @else {
+                None
+              }
+            </span>
           </div>
         </div>
       </div>
@@ -256,9 +270,11 @@ interface NetworkConfig {
                   <span>Uppercase Network:</span>
                   <span class="badge bg-success">{{ uppercaseNetwork() }}</span>
                 </li>
-                <li class="list-group-item d-flex justify-content-between">
+               <li class="list-group-item d-flex justify-content-between">
                   <span>Is Localhost:</span>
-                  <span class="badge bg-warning text-dark">{{ isLocalhost() }}</span>
+                  <span class="badge" [class]="isLocalhost() ? 'bg-warning text-dark' : 'bg-secondary'">
+                    {{ isLocalhost() ? 'Yes' : 'No' }}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -268,10 +284,9 @@ interface NetworkConfig {
                   <span>Config Valid:</span>
                   <span 
                     class="badge" 
-                    [class.bg-success]="isConfigValid()" 
-                    [class.bg-danger]="!isConfigValid()"
+                    [class]="isConfigValid() ? 'bg-success' : 'bg-danger'"
                   >
-                    {{ isConfigValid() ? 'Valid' : 'Invalid' }}
+                     {{ isConfigValid() ? 'Valid' : 'Invalid' }}
                   </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between">
@@ -284,13 +299,36 @@ interface NetworkConfig {
         </div>
       </div>
 
+      <!-- Network History with @for -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5>Network History</h5>
+        </div>
+        <div class="card-body">
+          @if (networkHistory().length > 0) {
+            <ul class="list-group">
+              @for (history of networkHistory(); track history; let i = $index) {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  {{ history }}
+                  <button class="btn btn-sm btn-outline-danger" (click)="removeFromHistory(i)">
+                    Remove
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="text-muted">No history yet. Start typing to see changes.</p>
+          }
+        </div>
+      </div>
+
       <!-- Reset Button -->
       <div class="mt-4">
         <button class="btn btn-warning" (click)="resetAll()">Reset All</button>
       </div>
     </div>
   `,
-  imports: [FormsModule]
+  imports: [FormsModule] // Only FormsModule and JsonPipe needed
 })
 export class SignalPage {
   // Basic signals
@@ -303,6 +341,7 @@ export class SignalPage {
   selectedProtocol = signal('');
   protocols = signal(['HTTP', 'HTTPS', 'TCP', 'UDP', 'WebSocket']);
   changeCount = signal(0);
+  networkHistory = signal<string[]>([]);
 
   // Form object signal with proper typing
   networkConfig = signal<NetworkConfig>({
@@ -340,12 +379,15 @@ export class SignalPage {
   // Input handlers
   onNetworkInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.network.set(input.value);
+    const value = input.value;
+    this.network.set(value);
+    this.addToHistory(value);
     this.incrementChangeCount();
   }
 
   onNetworkModelChange(): void {
     this.network.set(this.networkModel);
+    this.addToHistory(this.networkModel);
     this.incrementChangeCount();
   }
 
@@ -379,7 +421,7 @@ export class SignalPage {
     this.incrementChangeCount();
   }
 
-  // FIXED: Properly typed config input handler
+  // Fixed config input handler
   onConfigInput(field: keyof NetworkConfig, event: Event): void {
     const input = event.target as HTMLInputElement;
     
@@ -391,36 +433,21 @@ export class SignalPage {
     this.incrementChangeCount();
   }
 
-  // Alternative approach with individual handlers (type-safe)
-  onHostnameInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.networkConfig.update(config => ({
-      ...config,
-      hostname: input.value
-    }));
+  // History management
+  private addToHistory(value: string): void {
+    this.networkHistory.update(history => {
+      // Avoid duplicates in a row
+      if (history.length > 0 && history[history.length - 1] === value) {
+        return history;
+      }
+      return [...history, value];
+    });
   }
 
-  onIpAddressInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.networkConfig.update(config => ({
-      ...config,
-      ipAddress: input.value
-    }));
-  }
-
-  // Another approach using a generic update method
-  updateNetworkConfig<K extends keyof NetworkConfig>(field: K, value: NetworkConfig[K]): void {
-    this.networkConfig.update(config => ({
-      ...config,
-      [field]: value
-    }));
-  }
-
-  // Usage of the generic method
-  onGenericConfigInput(field: keyof NetworkConfig, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.updateNetworkConfig(field, input.value);
-    this.incrementChangeCount();
+  removeFromHistory(index: number): void {
+    this.networkHistory.update(history => 
+      history.filter((_, i) => i !== index)
+    );
   }
 
   private incrementChangeCount(): void {
@@ -443,5 +470,6 @@ export class SignalPage {
       gateway: '192.168.1.254'
     });
     this.changeCount.set(0);
+    this.networkHistory.set([]);
   }
 }
